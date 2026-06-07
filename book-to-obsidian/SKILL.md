@@ -212,13 +212,15 @@ In this mode:
 - first locate the matching course/book root folder inside the vault;
 - if the matching course/book root folder exists, continue that folder's existing route, naming style, chapter order, indexes, and note structure;
 - if no matching course/book root folder exists, create a new top-level course/book folder under the vault root and generate the course structure inside it;
-- write generated chapter folders, indexes, mappings, manifests, and assets inside the course/book root folder unless the user names another target;
+- write generated chapter folders and notes inside the course/book root folder unless the user names another target;
+- create index, mapping, manifest, or asset folders only when they contain useful files;
 - do not create an extra nested `vault/` directory;
+- do not create empty `assets/`, `assets/images/`, `mappings/`, `manifests/`, or `indexes/` folders;
 - preserve existing Obsidian folder order, naming conventions, front matter, tags, aliases, backlinks, and user-written notes;
 - update existing generated notes only when they map to the same chapter/section identity;
 - prefer patch-style edits over full rewrites when updating a note;
 - never delete or rename existing user notes unless the user explicitly asks;
-- record update decisions in `mappings/update-log.md` or `manifests/update-log.md`.
+- record update decisions only when useful, preferably in an existing course log or a non-empty `manifests/update-log.md`.
 
 ### 3.2.1 Course/book root selection
 
@@ -298,7 +300,7 @@ In this mode:
 - treat attached textbook PDFs, Markdown files, text files, or directories as `inputs/textbook`;
 - treat attached personal notes as `inputs/notes`;
 - generate all durable outputs in the requested workspace output directory, or directly in the current Obsidian vault when vault project mode is active;
-- still create `mappings/`, `indexes/`, and provenance records.
+- create indexes, mappings, and provenance records only when they are useful and non-empty.
 
 ## 4. Recommended filesystem input layout
 
@@ -329,38 +331,34 @@ Never place an entire chapter into one Markdown file if the textbook contains mu
 
 If vault project mode is active, the `vault/` root shown below means the selected course/book root folder inside the current Obsidian workspace, not a nested folder named `vault`.
 
-Create:
+Default preferred course structure:
 
 ```text
-vault/
-├── 00-全书目录.md
-├── chapters/
-│   ├── 01-绪论/
-│   │   ├── 00-本章目录.md
-│   │   ├── 01-01-什么是数据挖掘.md
-│   │   ├── 01-02-数据挖掘要解决的问题/
-│   │   │   ├── 00-小节目录.md
-│   │   │   ├── 01-02-01-可伸缩性.md
-│   │   │   ├── 01-02-02-高维性.md
-│   │   │   └── ...
-│   │   └── 99-本章复习与日志.md
-│   └── ...
-├── indexes/
-│   ├── 术语表.md
-│   ├── 公式速查.md
-│   ├── 数据集与外部资源.md
-│   ├── 对话问题索引.md
-│   ├── 学习薄弱点索引.md
-│   └── 待深入学习的问题.md
-├── mappings/
-│   ├── conversation-inventory.yaml
-│   ├── dialogue-to-section-map.yaml
-│   ├── synthesis-weight-report.yaml
-│   └── unresolved-dialogue-fragments.md
-├── manifests/
-└── assets/
-    └── images/
+课程名/
+├── 00-课程目录.md
+├── 第01章-绪论/
+│   ├── 01-现实动机/
+│   │   ├── 01.1-为什么需要自动化数据分析.md
+│   │   ├── 01.2-商业工业互联网与物联网应用.md
+│   │   └── ...
+│   ├── 02-什么是数据挖掘/
+│   │   ├── 02.1-数据挖掘的定义.md
+│   │   ├── 02.2-哪些任务不属于典型数据挖掘.md
+│   │   └── ...
+│   └── 99-本章复习.md
+└── 第02章-...
 ```
+
+Use the existing vault/course style when it is clear. The example above is preferred because it keeps chapter folders and section folders visible directly under the course, instead of hiding everything under a generic `chapters/` wrapper.
+
+Optional support folders:
+
+- `indexes/` only when global indexes are actually generated.
+- `mappings/` only when the mapping files will be useful for later updates or auditing.
+- `manifests/` only when update logs, run manifests, or generated-file inventories are actually written.
+- `assets/` only when real images, extracted figures, diagrams, OCR outputs, or media files are referenced by notes.
+
+Never create empty support folders. An empty `assets/images/` folder has no value and should be omitted.
 
 ## 6. Smallest meaningful subsection
 
@@ -373,7 +371,7 @@ Rules:
 - If a parent section has independent explanatory content, create `XX-XX-00-概述.md`.
 - If a conversation contains an important supplementary topic that does not map cleanly to a textbook subsection, place it in:
   ```text
-  chapters/<chapter>/supplementary/
+  <chapter>/supplementary/
   ```
   or:
   ```text
@@ -567,6 +565,17 @@ If conversation evidence and textbook importance disagree:
 
 Each note should reflect the user's actual learning path.
 
+Important writing stance:
+
+- The final note must read like a formal, polished study document, not like a chat transcript analysis.
+- Conversation weight means the dialogue decides emphasis, depth, examples, misconceptions, and what deserves extra explanation.
+- Do not expose the dialogue scaffolding as section titles such as "你在对话中真正卡住的问题" or prose like "你已经抓到了关键词".
+- Do not quote or narrate the user's conversation unless a brief source note is genuinely useful.
+- Integrate dialogue-derived weak points into formal sections such as "重点理解", "易错点", "例题", "应用场景", or "复习检查".
+- Use a neutral, academic, textbook-quality tone.
+- Make each note substantially explanatory. Prefer document-level detail: definitions, intuition, mechanisms, examples, edge cases, comparisons, formulas, applications, and review prompts.
+- Avoid short skeletal notes. A normal concept note should be detailed enough that the learner can review it independently without reopening the conversation.
+
 Content quality requirements for every note:
 
 - Provide high-quality, well-organized, practical notes.
@@ -604,42 +613,34 @@ status: draft
 ---
 ```
 
-Recommended structure:
+Recommended formal structure:
 
 ```markdown
 # X.X 小节标题
 
-## 1. 你在对话中真正卡住的问题
+## 1. 概念概览
 
-## 2. 本小节核心结论
+## 2. 学习重点
 
-## 3. 直觉理解
+## 3. 规范定义
 
-## 4. 教材中的规范定义
+## 4. 直觉解释
 
-## 5. 为什么需要它
+## 5. 原理与机制
 
-## 6. 机制、分类或步骤
+## 6. 关键步骤、分类或公式
 
-## 7. 教材补充：对话中未覆盖但必须掌握的内容
+## 7. 例题与具体案例
 
-## 8. 对话中出现的典型例子
+## 8. 易错点与边界情况
 
-## 9. 易混淆概念
+## 9. 与相关知识点的联系
 
-## 10. 边缘情况、限制与常见误区
+## 10. 实践应用与外部资源
 
-## 11. 对话中的典型问题
+## 11. 复习检查
 
-## 12. 与其他知识点的联系
-
-## 13. 工程日志与待确认事项
-
-## 14. 来源说明
-
-## 15. 外部练习、数据集与延伸资源
-
-## 16. 本小节复习清单
+## 12. 来源与修订记录
 ```
 
 ### 12.1 External resources
@@ -788,11 +789,15 @@ After each chapter:
    - dialogue-driven depth upgrades
    - textbook-only补漏 topics
    - unresolved questions
-5. Create `99-本章复习与日志.md`.
+5. Create `99-本章复习.md`.
+
+Do not put engineering logs into formal chapter notes. Keep logs in `manifests/update-log.md` only when a log is actually useful.
 
 ## 16. Global indexes
 
-Create:
+Create global indexes only when they are useful and non-empty. Do not create an `indexes/` folder merely because the template mentions it.
+
+Possible index files:
 
 ```text
 indexes/术语表.md
@@ -802,6 +807,13 @@ indexes/对话问题索引.md
 indexes/学习薄弱点索引.md
 indexes/待深入学习的问题.md
 ```
+
+Rules:
+
+- If there are no formulas, do not create `公式速查.md`.
+- If there are no meaningful external resources, do not create `数据集与外部资源.md`.
+- If no unresolved questions remain, do not create `待深入学习的问题.md`.
+- If the existing vault has another index naming/location convention, follow it.
 
 `学习薄弱点索引.md` should summarize:
 
@@ -822,8 +834,10 @@ indexes/待深入学习的问题.md
 ## 17. Quality requirements
 
 - Conversation content drives emphasis and learning flow.
+- Dialogue-derived emphasis must be integrated into formal note sections, not exposed as chat-like headings.
 - Textbook content fills gaps and guarantees systematic coverage.
 - Notes are detailed, orderly, practical, and suitable for long-term review.
+- Notes should be substantially explanatory, approaching well-written documentation rather than short outlines.
 - Use Markdown structure well instead of long unbroken paragraphs.
 - Use LaTeX well for formulas and mathematical expressions.
 - Explain symbols, assumptions, and common formula mistakes.
@@ -836,6 +850,8 @@ indexes/待深入学习的问题.md
 - Do not skip important textbook content merely because it was not discussed.
 - Do not let textbook summary style erase the learner's real questions.
 - Do not add excessive link lists or unannotated external resources.
+- Do not create empty support folders such as `assets/images`.
+- Use the existing or preferred course/chapter/section hierarchy instead of forcing a generic `chapters/` wrapper.
 - Upgrade depth based on actual confusion.
 - Keep OCR and engineering logs visible when useful.
 
@@ -845,6 +861,8 @@ indexes/待深入学习的问题.md
 - Never treat dialogue as merely an appendix.
 - Never mechanically summarize the textbook while ignoring the learner's questions.
 - Never paste full chat transcripts.
+- Never make the note sound like a direct conversation review.
+- Never use chat-like headings such as "你在对话中真正卡住的问题" in final formal notes.
 - Never preserve incorrect dialogue claims without correction.
 - Never skip textbook-only essentials.
 - Never create only one file for an entire chapter with multiple sections.
@@ -853,6 +871,7 @@ indexes/待深入学习的问题.md
 - Never force-map unrelated dialogue fragments.
 - Never write formulas as plain text when LaTeX would be clearer.
 - Never add external links without explaining why they are useful.
+- Never generate empty `assets`, `mappings`, `manifests`, or `indexes` folders.
 
 ## 19. Definition of done
 
@@ -867,6 +886,8 @@ Complete only when:
 - the matching course/book root folder has been located or created
 - requested chapters, sections, or knowledge points have been generated or updated
 - existing unrelated chapters and notes are preserved
+- empty support folders have not been created
+- final notes use formal academic/documentation style rather than chat-analysis style
 - each note records conversation/textbook weighting
 - dialogue-driven emphasis is visible
 - textbook-only补漏 content is visible
