@@ -99,7 +99,7 @@ It is a learner-specific study system:
 Required:
 
 - one or more exported AI learning conversation `.md` files, either attached in the current Codex conversation or available as filesystem paths
-- textbook source file or textbook directory, either attached in the current Codex conversation or available as filesystem paths
+- textbook source, either uploaded/local files in any readable format or user-approved web search results
 - target Obsidian vault or output directory
 
 Optional:
@@ -128,8 +128,10 @@ Use this priority for sources and target:
 1. Current workspace root as the target when it is an Obsidian vault.
 2. Existing course/book folders inside the current vault.
 3. Current conversation attachments as source files, including dragged-in Markdown files, PDFs, notes, or text files.
-4. Explicit filesystem paths supplied by the user.
-5. The recommended `inputs/` layout below.
+4. Uploaded or local textbook files in any readable format.
+5. Explicit filesystem paths supplied by the user.
+6. User-approved web search for public textbook or reference sources.
+7. The recommended `inputs/` layout below.
 
 Do not require the user to copy conversation Markdown files into the workspace if the same files are already attached and readable in the current conversation.
 
@@ -141,13 +143,58 @@ If attached files are available only as summarized chat context and not as reada
 
 When using attached files, preserve each attachment name as `source_file` in inventories, mappings, front matter, and source notes.
 
+### 3.1.1 Textbook source modes
+
+Support two textbook input modes.
+
+#### Mode A: uploaded or local textbook files
+
+The user may upload, drag in, or provide local paths to the textbook in any format the current environment can read or convert, including:
+
+- PDF
+- Markdown
+- plain text
+- Word documents
+- EPUB
+- HTML
+- images or scanned pages when OCR is available
+- folders containing chapter files, notes, slides, code, figures, or textbook companion material
+- zip archives when the environment can extract them
+
+When using uploaded or local files:
+
+- preserve original filenames and paths in provenance records;
+- extract or inspect the table of contents before reading large content;
+- ask for the textbook reading strategy before reading textbook body content;
+- if a format is unreadable, ask the user for a converted file, OCR text, or a different source.
+
+#### Mode B: web-searched textbook or reference source
+
+The user may ask the agent to search the web for public textbooks, open course notes, official documentation, papers, datasets, or other references.
+
+Before using web search:
+
+- ask for permission unless the user has already explicitly requested web search;
+- clarify the target book/course/topic when ambiguous;
+- prefer official, public, legal, and authoritative sources;
+- record source URLs, titles, access dates, and confidence;
+- distinguish a true textbook/source from supplementary references;
+- do not use random summaries, SEO pages, or unreliable blog posts as the textbook authority;
+- do not claim to have read a full book from search results unless the actual readable content was accessed.
+
+When both uploaded/local files and web sources are available:
+
+- treat the uploaded/local textbook as the primary textbook source unless the user says otherwise;
+- use web sources for补漏, examples, exercises, datasets, official documentation, or cross-checking;
+- clearly label web-derived additions in source notes.
+
 ### 3.2 Primary workflow: Obsidian vault project mode
 
 The preferred use is:
 
 1. Open the Obsidian vault folder as the current Codex/Claude project.
 2. Attach or drag in exported conversation Markdown files from ChatGPT or other AI tools.
-3. Provide the textbook as an attachment or path.
+3. Provide the textbook by uploading a file, giving a local path, or asking for user-approved web search.
 4. Ask this skill to create or update notes directly inside the current vault.
 
 The user may be continuing an existing course, such as adding Chapter 7 after Chapters 1-6 already exist, or generating a deeper child note for one knowledge point inside an existing chapter.
@@ -234,7 +281,7 @@ For an existing note, use this update policy:
 Recommended invocation:
 
 ```text
-Please use $book-to-obsidian in the current Obsidian vault. Read the attached conversation Markdown and textbook, locate or create the matching course folder, then create or update notes directly there.
+Please use $book-to-obsidian in the current Obsidian vault. Read the attached conversation Markdown, use the uploaded/local textbook or ask before web-searching for a public source, locate or create the matching course folder, then create or update notes directly there.
 ```
 
 ### 3.3 Drag-and-run usage
@@ -812,6 +859,7 @@ indexes/待深入学习的问题.md
 Complete only when:
 
 - conversation files have been inventoried
+- textbook source mode has been recorded as uploaded/local or user-approved web search
 - textbook reading strategy has been confirmed and recorded
 - textbook hierarchy has been extracted
 - dialogue fragments have been mapped
