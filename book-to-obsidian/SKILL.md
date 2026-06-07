@@ -1,11 +1,15 @@
 ---
 name: book-to-obsidian
-description: Convert exported AI learning conversations plus a textbook into a hierarchical Obsidian vault. Use conversation Markdown as the primary source of teaching focus and explanation style (60%) and the textbook as the supporting source for structure, terminology, coverage, correction, and systematic completion (40%). Create one folder per chapter and one Markdown note per smallest meaningful subsection. Prioritize the user's real questions, misunderstandings, follow-ups, analogies, examples, and preferred explanations, while using the textbook to fill gaps and ensure coverage. Automatically adjust depth based on both conversation evidence and textbook importance.
+description: Create or update course notes directly inside an Obsidian vault opened as the current Codex/Claude project. Use exported AI conversation Markdown attachments as the primary learning source (60%) and the textbook as the supporting source (40%). First locate an existing matching course/book folder in the vault; if it exists, continue its existing chapter route, naming style, indexes, and note structure; if it does not exist, create a new top-level course/book folder and generate chapter/subsection notes inside it. Support incremental work such as adding Chapter 7 after Chapters 1-6 already exist, expanding a single knowledge point into child notes, or updating an existing note from new conversation evidence. Do not create an extra nested vault folder when the current project is already the target Obsidian vault.
 ---
 
 # Book to Obsidian
 
-Convert exported AI learning conversations and a textbook into a hierarchical Obsidian-compatible Markdown vault.
+Convert exported AI learning conversations and a textbook into hierarchical Obsidian-compatible Markdown notes.
+
+The primary workflow is to open the user's existing Obsidian vault as the current Codex/Claude project, attach or drag in exported AI conversation Markdown files plus the textbook, then create or update notes directly inside that vault.
+
+If the matching course/book folder already exists, continue its existing structure. If it does not exist, create a new top-level course/book folder first, then generate the chapter and subsection notes inside it.
 
 ## 1. Core synthesis model
 
@@ -96,7 +100,7 @@ Required:
 
 - one or more exported AI learning conversation `.md` files, either attached in the current Codex conversation or available as filesystem paths
 - textbook source file or textbook directory, either attached in the current Codex conversation or available as filesystem paths
-- output directory for the generated vault
+- target Obsidian vault or output directory
 
 Optional:
 
@@ -119,12 +123,13 @@ Default to:
 
 Prefer attached or dragged-in files when the user provides them in the current Codex conversation.
 
-Use this priority:
+Use this priority for sources and target:
 
-1. Current conversation attachments, including dragged-in Markdown files, PDFs, notes, or text files.
-2. Explicit filesystem paths supplied by the user.
-3. The current workspace root when it is an Obsidian vault.
-4. The recommended `inputs/` layout below.
+1. Current workspace root as the target when it is an Obsidian vault.
+2. Existing course/book folders inside the current vault.
+3. Current conversation attachments as source files, including dragged-in Markdown files, PDFs, notes, or text files.
+4. Explicit filesystem paths supplied by the user.
+5. The recommended `inputs/` layout below.
 
 Do not require the user to copy conversation Markdown files into the workspace if the same files are already attached and readable in the current conversation.
 
@@ -136,9 +141,16 @@ If attached files are available only as summarized chat context and not as reada
 
 When using attached files, preserve each attachment name as `source_file` in inventories, mappings, front matter, and source notes.
 
-### 3.2 Obsidian vault project mode
+### 3.2 Primary workflow: Obsidian vault project mode
 
-The user may open an existing Obsidian vault folder as the current Codex project/workspace and ask this skill to generate or update notes in place.
+The preferred use is:
+
+1. Open the Obsidian vault folder as the current Codex/Claude project.
+2. Attach or drag in exported conversation Markdown files from ChatGPT or other AI tools.
+3. Provide the textbook as an attachment or path.
+4. Ask this skill to create or update notes directly inside the current vault.
+
+The user may be continuing an existing course, such as adding Chapter 7 after Chapters 1-6 already exist, or generating a deeper child note for one knowledge point inside an existing chapter.
 
 Detect this mode when:
 
@@ -150,13 +162,65 @@ Detect this mode when:
 In this mode:
 
 - treat the current workspace root as the vault root;
-- write generated chapter folders, indexes, mappings, manifests, and assets directly under the vault root unless the user names a subfolder;
+- first locate the matching course/book root folder inside the vault;
+- if the matching course/book root folder exists, continue that folder's existing route, naming style, chapter order, indexes, and note structure;
+- if no matching course/book root folder exists, create a new top-level course/book folder under the vault root and generate the course structure inside it;
+- write generated chapter folders, indexes, mappings, manifests, and assets inside the course/book root folder unless the user names another target;
 - do not create an extra nested `vault/` directory;
 - preserve existing Obsidian folder order, naming conventions, front matter, tags, aliases, backlinks, and user-written notes;
 - update existing generated notes only when they map to the same chapter/section identity;
 - prefer patch-style edits over full rewrites when updating a note;
 - never delete or rename existing user notes unless the user explicitly asks;
 - record update decisions in `mappings/update-log.md` or `manifests/update-log.md`.
+
+### 3.2.1 Course/book root selection
+
+Before generating files in vault project mode:
+
+1. Inspect the vault root and likely study folders.
+2. Look for an existing folder whose name, aliases, index files, chapter names, tags, or front matter match the textbook/course.
+3. If one clear match exists, use it as the course/book root.
+4. If multiple plausible matches exist, ask the user which folder to use.
+5. If no match exists, create a new top-level folder named after the course/book, using the vault's existing naming style when possible.
+
+Examples:
+
+```text
+ObsidianVault/
+├── 数据结构/
+│   ├── 01-绪论/
+│   ├── 02-线性表/
+│   └── 06-图/
+```
+
+If the user asks to generate Chapter 7 Sorting, create:
+
+```text
+ObsidianVault/
+└── 数据结构/
+    └── 07-排序/
+```
+
+If `数据结构/` does not exist, create it first:
+
+```text
+ObsidianVault/
+└── 数据结构/
+    ├── 00-课程目录.md
+    └── 07-排序/
+```
+
+### 3.2.2 Incremental generation
+
+Support partial, incremental generation:
+
+- add a new chapter after existing chapters;
+- add a missing subsection inside an existing chapter;
+- expand one knowledge point into child notes;
+- update one existing note using new dialogue evidence;
+- refresh indexes only for affected folders unless the user asks for a full rebuild.
+
+Do not require all textbook chapters to be generated in one run. If the user is currently learning Chapter 7, focus on Chapter 7 and its dependencies, while preserving links to existing Chapters 1-6.
 
 For an existing note, use this update policy:
 
@@ -170,7 +234,7 @@ For an existing note, use this update policy:
 Recommended invocation:
 
 ```text
-Please use $book-to-obsidian in the current Obsidian vault. Read the attached conversation Markdown and textbook, then create or update notes directly in this vault.
+Please use $book-to-obsidian in the current Obsidian vault. Read the attached conversation Markdown and textbook, locate or create the matching course folder, then create or update notes directly there.
 ```
 
 ### 3.3 Drag-and-run usage
@@ -178,7 +242,7 @@ Please use $book-to-obsidian in the current Obsidian vault. Read the attached co
 The user may drag exported conversation Markdown files and a textbook file directly into the Codex conversation, then invoke:
 
 ```text
-Please use $book-to-obsidian on the attached conversation Markdown files and attached textbook. Generate the Obsidian vault in ./vault.
+Please use $book-to-obsidian on the attached conversation Markdown files and attached textbook. If the current project is an Obsidian vault, locate or create the course folder and update it in place; otherwise generate the vault in ./vault.
 ```
 
 In this mode:
@@ -191,7 +255,7 @@ In this mode:
 
 ## 4. Recommended filesystem input layout
 
-This layout is optional when files are provided as current conversation attachments or when the current project is already the target Obsidian vault.
+This layout is secondary. Use it when the current project is not the target Obsidian vault, or when the user prefers a separate staging workspace.
 
 ```text
 workspace/
@@ -216,7 +280,7 @@ Preserve the textbook chapter hierarchy, but let conversation content drive emph
 
 Never place an entire chapter into one Markdown file if the textbook contains multiple sections.
 
-If vault project mode is active, the `vault/` root shown below means the current Obsidian workspace root, not a nested folder named `vault`.
+If vault project mode is active, the `vault/` root shown below means the selected course/book root folder inside the current Obsidian workspace, not a nested folder named `vault`.
 
 Create:
 
@@ -647,8 +711,10 @@ Complete only when:
 - conversation files have been inventoried
 - textbook hierarchy has been extracted
 - dialogue fragments have been mapped
-- every textbook chapter has a folder
-- every smallest meaningful subsection has a note
+- the target Obsidian vault or output directory has been identified
+- the matching course/book root folder has been located or created
+- requested chapters, sections, or knowledge points have been generated or updated
+- existing unrelated chapters and notes are preserved
 - each note records conversation/textbook weighting
 - dialogue-driven emphasis is visible
 - textbook-only补漏 content is visible
@@ -657,4 +723,4 @@ Complete only when:
 - learning weak points are indexed
 - unresolved dialogue fragments remain visible
 - core topics are detailed enough
-- vault passes validation
+- affected notes, indexes, and mappings pass validation
