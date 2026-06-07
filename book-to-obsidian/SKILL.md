@@ -123,7 +123,8 @@ Use this priority:
 
 1. Current conversation attachments, including dragged-in Markdown files, PDFs, notes, or text files.
 2. Explicit filesystem paths supplied by the user.
-3. The recommended `inputs/` layout below.
+3. The current workspace root when it is an Obsidian vault.
+4. The recommended `inputs/` layout below.
 
 Do not require the user to copy conversation Markdown files into the workspace if the same files are already attached and readable in the current conversation.
 
@@ -135,7 +136,44 @@ If attached files are available only as summarized chat context and not as reada
 
 When using attached files, preserve each attachment name as `source_file` in inventories, mappings, front matter, and source notes.
 
-### 3.2 Drag-and-run usage
+### 3.2 Obsidian vault project mode
+
+The user may open an existing Obsidian vault folder as the current Codex project/workspace and ask this skill to generate or update notes in place.
+
+Detect this mode when:
+
+- the current workspace contains `.obsidian/`;
+- the user says the current project is the Obsidian vault;
+- the requested output is `.`, the current folder, or an existing vault path;
+- existing Obsidian notes, chapter folders, indexes, or mappings are already present.
+
+In this mode:
+
+- treat the current workspace root as the vault root;
+- write generated chapter folders, indexes, mappings, manifests, and assets directly under the vault root unless the user names a subfolder;
+- do not create an extra nested `vault/` directory;
+- preserve existing Obsidian folder order, naming conventions, front matter, tags, aliases, backlinks, and user-written notes;
+- update existing generated notes only when they map to the same chapter/section identity;
+- prefer patch-style edits over full rewrites when updating a note;
+- never delete or rename existing user notes unless the user explicitly asks;
+- record update decisions in `mappings/update-log.md` or `manifests/update-log.md`.
+
+For an existing note, use this update policy:
+
+1. Read the existing note first.
+2. Preserve front matter keys that are not owned by this skill.
+3. Preserve user sections that are outside generated section headings.
+4. Refresh generated sections when new dialogue or textbook evidence changes the content.
+5. Add new backlinks and index entries without breaking old links.
+6. If a conflict is unclear, create a proposed replacement note or a diff note instead of overwriting.
+
+Recommended invocation:
+
+```text
+Please use $book-to-obsidian in the current Obsidian vault. Read the attached conversation Markdown and textbook, then create or update notes directly in this vault.
+```
+
+### 3.3 Drag-and-run usage
 
 The user may drag exported conversation Markdown files and a textbook file directly into the Codex conversation, then invoke:
 
@@ -148,12 +186,12 @@ In this mode:
 - treat attached Markdown files that look like exported AI conversations as `inputs/conversations`;
 - treat attached textbook PDFs, Markdown files, text files, or directories as `inputs/textbook`;
 - treat attached personal notes as `inputs/notes`;
-- generate all durable outputs in the requested workspace output directory;
+- generate all durable outputs in the requested workspace output directory, or directly in the current Obsidian vault when vault project mode is active;
 - still create `mappings/`, `indexes/`, and provenance records.
 
 ## 4. Recommended filesystem input layout
 
-This layout is optional when files are provided as current conversation attachments.
+This layout is optional when files are provided as current conversation attachments or when the current project is already the target Obsidian vault.
 
 ```text
 workspace/
@@ -177,6 +215,8 @@ workspace/
 Preserve the textbook chapter hierarchy, but let conversation content drive emphasis inside each note.
 
 Never place an entire chapter into one Markdown file if the textbook contains multiple sections.
+
+If vault project mode is active, the `vault/` root shown below means the current Obsidian workspace root, not a nested folder named `vault`.
 
 Create:
 
