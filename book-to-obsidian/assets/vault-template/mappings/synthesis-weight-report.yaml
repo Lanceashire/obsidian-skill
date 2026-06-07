@@ -1,0 +1,4 @@
+weights:
+  conversation: 0.60
+  textbook: 0.40
+notes: []
