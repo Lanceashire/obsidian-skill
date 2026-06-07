@@ -1,76 +1,17 @@
 # obsidian-skill
 
-这是一个 Codex/Agents skill 仓库，目前包含 `book-to-obsidian`：
+把 AI 学习对话、教材和你的 Obsidian 笔记库接起来的 Codex/Claude skill。
 
-把导出的 AI 学习对话和教材整合成 Obsidian 笔记。主要用法是：把 Obsidian 的笔记文件夹当作 Codex/Claude 项目打开，直接在现有 vault 里新建或更新课程笔记。
+当前仓库包含 `book-to-obsidian`：它会优先读取你从 ChatGPT 或其他 AI 导出的学习对话 Markdown，再用教材做结构、术语、公式和覆盖面的校验补充，直接在 Obsidian vault 里新建或更新课程笔记。
 
-## 核心能力
+## 推荐工作流
 
-- 以 AI 学习对话作为主要教学来源，权重为 60%。
-- 以教材作为结构、术语、公式、覆盖面和正确性来源，权重为 40%。
-- 保留教材章节层级，按章节、小节、最小有意义小节生成 Markdown 笔记。
-- 自动识别反复追问、误解、纠正、类比、例题和薄弱点。
-- 将对话中的真实困惑写进笔记，而不是把对话简单附在末尾。
-- 善用 Markdown 结构和 LaTeX 公式，生成清晰、详尽、实用但不过度冗长的笔记。
-- 用教材纠正对话中的错误或不严谨说法。
-- 按任何主题的学科特点补充高价值外部资源，例如练习题、案例、数据集、工具、可视化、官方文档、论文或权威资料，并添加用途注释。
-- 生成对话问题索引、学习薄弱点索引、外部资源索引和权重报告。
+最推荐这样用：
 
-## 仓库结构
-
-```text
-.
-├── README.md
-└── book-to-obsidian/
-    ├── SKILL.md
-    ├── README.md
-    ├── CHANGELOG-v0.4.md
-    ├── references/
-    │   ├── conversation-primary-rules.md
-    │   ├── depth-routing-rules.md
-    │   ├── quality-checklist.md
-    │   └── section-note-template.md
-    └── assets/
-        └── vault-template/
-            ├── indexes/
-            └── mappings/
-```
-
-## 安装方法
-
-把整个 `book-to-obsidian` 文件夹复制到你的 skill 目录。
-
-常见位置：
-
-```text
-~/.agents/skills/book-to-obsidian
-```
-
-如果你使用的是 Codex 本地 skill 目录，也可以放到：
-
-```text
-~/.codex/skills/book-to-obsidian
-```
-
-最终目录里应该能直接看到：
-
-```text
-book-to-obsidian/
-├── SKILL.md
-├── references/
-└── assets/
-```
-
-## 主要用法：打开 Obsidian Vault 后直接运行
-
-推荐工作流：
-
-1. 在 Codex 或 Claude 中，把 Obsidian 的 vault 文件夹作为项目文件夹打开。
-2. 把从 ChatGPT 或其他 AI 导出的学习对话 `.md` 文件直接拖进对话。
-3. 提供教材：可以上传/拖拽整个教材文件，也可以给本地路径，或明确要求联网搜索公开教材/资料。
-4. 调用 `$book-to-obsidian`，让它直接在当前 vault 里创建或更新笔记。
-
-调用示例：
+1. 在 Codex 或 Claude 中，把 Obsidian vault 文件夹作为项目打开。
+2. 把导出的学习对话 `.md` 文件直接拖进对话。
+3. 提供教材：上传文件、给本地路径，或明确要求联网搜索公开资料。
+4. 调用 `$book-to-obsidian`，让它在当前 vault 中原地创建或更新笔记。
 
 ```text
 请使用 $book-to-obsidian，以当前项目作为 Obsidian vault。
@@ -81,7 +22,7 @@ book-to-obsidian/
 不要创建额外的 vault 子目录，不要删除或重命名我已有的笔记。
 ```
 
-比如你已经有：
+如果你已经有：
 
 ```text
 ObsidianVault/
@@ -91,7 +32,7 @@ ObsidianVault/
     └── 06-图/
 ```
 
-现在学到第七章排序，skill 应该继续生成：
+现在学到第七章，它会继续生成：
 
 ```text
 ObsidianVault/
@@ -99,151 +40,105 @@ ObsidianVault/
     └── 07-排序/
 ```
 
-如果当前 vault 里还没有 `数据结构/`，skill 应该先创建：
+如果还没有 `数据结构/`，则先创建课程总文件夹，再在里面生成章节、小节和子文件。
+
+## 它怎么写笔记
+
+`book-to-obsidian` 不是教材摘要工具。它默认使用：
 
 ```text
-ObsidianVault/
-└── 数据结构/
-    ├── 00-课程目录.md
-    └── 07-排序/
+AI 学习对话：60%
+教材：40%
 ```
 
-它也支持更小粒度的增量更新，比如只生成第七章里的某个知识点、把某个知识点拆成子文件、或根据新的对话更新已有笔记。
+对话负责发现你真正卡住的问题、反复追问、误解、例子、类比和学习偏好。教材负责章节结构、术语校准、公式、系统覆盖和错误纠正。
 
-## 教材读取方式
+生成的笔记会：
 
-教材来源有两种：
+- 保留教材章节层级；
+- 一章一个文件夹，一个最小有意义小节一个 Markdown；
+- 支持只新增某章、某节或某个知识点；
+- 更新已有笔记时保留 front matter、标签、别名、双链和手写内容；
+- 用 Markdown 组织结构，用 LaTeX 表达公式；
+- 按主题补充练习题、案例、数据集、工具、可视化、官方文档、论文或权威参考；
+- 为外部资源添加用途注释，而不是只堆链接。
 
-1. 上传或本地教材文件：支持当前环境能读取或转换的任意格式，例如 PDF、Markdown、txt、Word、EPUB、HTML、图片/扫描页、章节文件夹、zip 等。
-2. 联网搜索：你可以要求 AI 搜索公开教材、课程讲义、官方文档、论文或参考资料。联网搜索前应先得到你的许可，且要优先使用公开、合法、权威来源。
+## 教材来源
 
-如果同时提供上传教材和联网资料，默认以上传/本地教材为主，联网资料用于补漏、例题、外部资源或交叉校验。
+教材可以来自两种方式：
 
-为了省 token，skill 不应该默认一次性读取完整本教材。读取教材正文前，会先让你选择：
+| 方式 | 说明 |
+| --- | --- |
+| 上传或本地文件 | 支持当前环境能读取或转换的格式，例如 PDF、Markdown、txt、Word、EPUB、HTML、扫描页、章节文件夹或 zip。 |
+| 联网搜索 | 用户明确允许后，搜索公开教材、课程讲义、官方文档、论文或参考资料。需要记录 URL、标题、访问日期和可信度。 |
 
-1. 按章节读取，推荐。先读目录和目标章节，再匹配导出的对话 Markdown。
-2. 直接读取完整本教材，只适合教材很短或你明确需要全书统筹。
-3. 指定读取范围，例如第七章、某个小节、某个页码范围或某个知识点。
+如果同时有本地教材和联网资料，默认以本地教材为主，联网资料用于补漏、例题、外部资源和交叉校验。
 
-推荐默认说法：
+## 省 Token 读取策略
+
+skill 不应该默认一次性读取完整本教材。读取教材正文前，会先确认策略：
+
+1. `按章节读取`，推荐。先读目录和当前目标章节，再匹配导出的对话 Markdown。
+2. `直接读取完整本教材`，只适合教材很短或你明确需要全书统筹。
+3. `指定读取范围`，例如某章、某节、页码范围或知识点。
+
+推荐说法：
 
 ```text
 教材按章节读取。先读目录和当前目标章节，再匹配我上传的对话 Markdown。
 如果内容不够，再继续读取相关前置章节或引用章节。
 ```
 
-## 次要用法一：只拖拽文件并生成新 Vault
+## 安装
 
-最省事的方式是直接把文件拖到 Codex 对话里，然后调用 skill。
+把整个 `book-to-obsidian` 文件夹复制到你的 skill 目录：
 
-你可以拖入：
+```text
+~/.agents/skills/book-to-obsidian
+```
 
-- 导出的 AI 学习对话 `.md` 文件；
-- 教材 PDF、Markdown 或文本文件；
-- 你自己的补充笔记。
+或：
 
-然后这样说：
+```text
+~/.codex/skills/book-to-obsidian
+```
+
+安装后目录应类似：
+
+```text
+book-to-obsidian/
+├── SKILL.md
+├── references/
+└── assets/
+```
+
+## 其他用法
+
+### 只拖拽文件并生成新 Vault
 
 ```text
 请使用 $book-to-obsidian，读取我刚刚拖进来的对话 Markdown 和教材，
 按对话 60%、教材 40% 的权重生成 Obsidian vault，输出到 ./vault。
 ```
 
-在这种模式下，不需要提前把对话 Markdown 放进 `inputs/conversations/`。skill 会优先使用当前对话里上传或拖拽的附件，并把附件文件名保存在来源记录里。
-
-如果 Codex 当前环境无法直接读取附件内容，或者文件数量很大、教材很长，再改用下面的工作区目录方式。
-
-## 次要用法二：工作区目录
-
-如果文件很多，或者你希望以后反复运行同一批材料，建议为每次转换准备一个独立工作目录：
+### 使用独立工作区
 
 ```text
 workspace/
 ├── inputs/
 │   ├── conversations/
-│   │   ├── 学习对话-01.md
-│   │   └── 学习对话-02.md
 │   ├── textbook/
-│   │   └── 教材.pdf
 │   └── notes/
-│       └── 我的补充笔记.md
 └── vault/
 ```
 
-### conversations
+## 输出结构
 
-放从 ChatGPT、Claude、Gemini 或其他 AI 工具导出的学习对话 Markdown。
-
-这些对话会被作为主要来源，用来判断：
-
-- 你真正卡住的问题；
-- 哪些概念需要重点展开；
-- 哪些误区需要纠正；
-- 哪些类比、例子或解释方式对你有效；
-- 哪些问题还没有完全解决。
-
-### textbook
-
-放教材文件或教材目录。可以是当前环境能读取或转换的任意格式，例如 PDF、Markdown、txt、Word、EPUB、HTML、图片/扫描页、章节文件夹或 zip。
-
-也可以不上传教材文件，而是明确要求联网搜索公开教材或参考资料。联网搜索得到的内容需要记录 URL、标题、访问日期和可信度。
-
-教材负责：
-
-- 保留章节结构；
-- 校验定义和术语；
-- 补全公式、表格、例题和系统知识；
-- 纠正对话中的错误；
-- 防止重要章节因为对话没有提到就被漏掉。
-
-### notes
-
-可选。放你自己的补充笔记、课堂记录、错题、代码实验记录等。
-
-## 基本调用方式
-
-在 Codex 或支持 skill 的 agents 环境里，可以这样说：
+在新 vault 或课程文件夹中，输出通常类似：
 
 ```text
-请使用 $book-to-obsidian，按对话 60%、教材 40% 的权重，
-将 inputs/conversations 中的学习记录和 inputs/textbook 中的教材
-整合成 Obsidian 笔记，输出到 vault。
-```
-
-如果是拖拽附件模式，可以这样说：
-
-```text
-请使用 $book-to-obsidian，读取本轮对话里上传的 Markdown 对话和教材，
-生成 Obsidian vault 到 ./vault。
-```
-
-如果当前项目就是 Obsidian vault，可以这样说：
-
-```text
-请使用 $book-to-obsidian，以当前项目作为 Obsidian vault，
-读取本轮上传的对话和教材。先定位或创建对应课程总文件夹，
-再在该课程文件夹里新建或更新章节、知识点和子文件。
-```
-
-也可以给得更具体：
-
-```text
-请使用 $book-to-obsidian，把这门数据挖掘课程整理成 Obsidian vault。
-要求：
-1. 对话是主要依据，教材用于校验和补漏；
-2. 保留教材章节结构；
-3. 每个最小小节单独生成一个 Markdown；
-4. 对我反复问过的问题加深讲解；
-5. 生成对话问题索引和学习薄弱点索引。
-```
-
-## 输出结果
-
-生成的 Obsidian vault 通常类似：
-
-```text
-vault/
-├── 00-全书目录.md
+课程名/
+├── 00-课程目录.md
 ├── chapters/
 │   ├── 01-绪论/
 │   │   ├── 00-本章目录.md
@@ -255,120 +150,38 @@ vault/
 │   ├── 公式速查.md
 │   ├── 对话问题索引.md
 │   ├── 学习薄弱点索引.md
-│   └── 待深入学习的问题.md
-├── mappings/
-│   ├── conversation-inventory.yaml
-│   ├── dialogue-to-section-map.yaml
-│   ├── synthesis-weight-report.yaml
-│   └── unresolved-dialogue-fragments.md
-└── assets/
-    └── images/
+│   └── 数据集与外部资源.md
+└── mappings/
+    ├── conversation-inventory.yaml
+    ├── dialogue-to-section-map.yaml
+    └── synthesis-weight-report.yaml
 ```
 
-## 单篇笔记格式
+## 笔记质量标准
 
-每个小节笔记会包含 front matter，用于记录来源和生成策略：
-
-```yaml
----
-chapter: 第 X 章
-section: X.X
-title: 小节标题
-textbook_source: 教材来源
-conversation_weight: 0.60
-textbook_weight: 0.40
-dialogue_enrichment: true
-dialogue_sources:
-  - 学习对话-01.md
-depth_level: deep-concept
-depth_upgrade_reason:
-  - 用户反复追问
-status: draft
----
-```
-
-正文通常包含：
-
-- 你在对话中真正卡住的问题；
-- 本小节核心结论；
-- 直觉理解；
-- 教材中的规范定义；
-- 机制、分类或步骤；
-- 教材补充内容；
-- 对话中出现的典型例子；
-- 易混淆概念；
-- 边缘情况、限制与常见误区；
-- 对话中的典型问题；
-- 与其他知识点的联系；
-- 本小节复习清单。
-
-## 深度等级
-
-skill 会根据对话证据和教材重要性自动决定笔记深度。
-
-```text
-对话证据：60%
-教材重要性：40%
-```
-
-支持四类深度：
-
-- `orientation`：绪论、概览、过渡内容。
-- `standard`：普通概念，覆盖定义、直觉、机制、例子和易错点。
-- `deep-concept`：核心概念，例如噪声、缺失值、数据质量、预处理、相似度、过拟合等。
-- `algorithm-or-math`：算法、公式、度量、推导和评价指标。
-
-当对话里出现反复追问、明确困惑、多次纠正、代码困难或边缘情况时，笔记会自动升级深度。
-
-## 内容风格
-
-默认要求：
-
-- 知识点讲解详尽、清晰、有条理，适合长期复习；
-- 避免无意义扩写和过度复杂的表述；
-- 善用 Markdown 的标题、列表、表格、callout、链接、代码块和检查清单；
-- 善用 LaTeX 表达公式、递推式、复杂度、概率、矩阵、距离度量和优化目标；
-- 写出公式后解释符号含义、适用条件和常见错误；
-- 按主题补充合适的外部资源，例如练习题、案例、数据集、工具、可视化、官方文档、论文、标准或权威参考；
-- 数据结构可用 LeetCode 和算法可视化，数据挖掘可用 UCI、Kaggle、OpenML、Hugging Face Datasets；其他主题也应类比选择对应的高价值资源；
+- 详尽、清晰、有条理，适合长期复习。
+- 避免无意义扩写和过度复杂表达。
+- 善用 Markdown：标题、列表、表格、callout、链接、代码块和检查清单。
+- 善用 LaTeX：公式、递推式、复杂度、概率、矩阵、距离度量和优化目标。
+- 写出公式后解释符号含义、适用条件和常见错误。
 - 外部资源必须有简短注释，说明为什么值得看或怎么用。
 
-## 质量要求
-
-使用时建议检查：
-
-- 是否明确体现对话 60%、教材 40%；
-- 是否保留教材章节层级；
-- 是否每个最小有意义小节都有独立 Markdown；
-- 是否善用了 Markdown 和 LaTeX；
-- 是否把反复困惑写成重点讲解；
-- 是否纠正了对话中的错误结论；
-- 是否为合适主题补充了带注释的外部资源；
-- 是否没有复制长篇聊天原文；
-- 是否生成了对话问题索引；
-- 是否生成了学习薄弱点索引；
-- 是否保留了无法映射的对话片段。
-
-详细检查清单见：
+详细规则见：
 
 ```text
+book-to-obsidian/SKILL.md
 book-to-obsidian/references/quality-checklist.md
 ```
 
-## 版本
-
-当前版本：`v0.4`
-
-主要变化：
-
-- 将对话提升为主导来源；
-- 设置对话 60%、教材 40% 的权重；
-- 新增学习薄弱点索引；
-- 新增教材补充 callout；
-- 保留教材层级结构，但不机械摘要教材。
-
-详见：
+## 仓库结构
 
 ```text
-book-to-obsidian/CHANGELOG-v0.4.md
+.
+├── README.md
+└── book-to-obsidian/
+    ├── SKILL.md
+    ├── README.md
+    ├── CHANGELOG-v0.4.md
+    ├── references/
+    └── assets/
 ```
