@@ -338,27 +338,66 @@ Rules:
 
 Never load all textbook pages and all conversation files in one pass.
 
+Before reading textbook content, confirm the textbook reading scope unless the user has already specified it.
+
+Ask the user to choose one of:
+
+1. Chapter-by-chapter reading, recommended for token efficiency and incremental Obsidian updates.
+2. Full-book reading, only when the book is short enough or the user explicitly wants a full global pass.
+3. User-specified reading range, such as a chapter, section, page range, topic, or existing note that needs updating.
+
+Default recommendation:
+
+```text
+建议按章节读取教材：先读取目录和当前目标章节，再匹配导出的对话 Markdown；如果内容不够，再继续读取相关章节或前置章节。
+```
+
+Do not silently read the whole textbook when the user has not chosen a strategy.
+
+If the user chooses chapter-by-chapter reading:
+
+- read the table of contents or outline first;
+- identify the target chapter, section, or knowledge point from the user's request, existing vault structure, and conversation evidence;
+- read only that chapter or section first;
+- match relevant exported conversation fragments to that chapter;
+- generate or update notes when the chapter content and dialogue evidence are sufficient;
+- if evidence is insufficient, read adjacent prerequisite, follow-up, or cross-referenced sections only as needed;
+- continue chapter by chapter until the requested scope is complete.
+
+If the user chooses full-book reading:
+
+- still prefer outline-first processing;
+- summarize or chunk the textbook instead of holding the full book in context;
+- process chapters sequentially and validate outputs incrementally.
+
+If the user specifies a range:
+
+- read only that range plus the minimum prerequisite or referenced material needed for correctness;
+- do not expand to unrelated chapters unless the user approves or the note would be incorrect without them.
+
 Use:
 
-1. Inspect conversation files.
-2. Extract useful dialogue fragments.
-3. Inspect textbook.
-4. Build textbook hierarchy.
-5. Map dialogue fragments to textbook subsections.
-6. Rank subsections by:
+1. Ask or confirm the textbook reading strategy.
+2. Inspect conversation files.
+3. Extract useful dialogue fragments.
+4. Inspect the textbook outline or table of contents.
+5. Read the selected chapter, full-book chunks, or user-specified range.
+6. Build or update the textbook hierarchy for the selected scope.
+7. Map dialogue fragments to textbook subsections.
+8. Rank subsections by:
    - conversation frequency
    - confusion intensity
    - textbook importance
    - prerequisite importance
-7. Process one smallest meaningful subsection at a time.
-8. Read only:
+9. Process one smallest meaningful subsection at a time.
+10. Read only:
    - relevant dialogue fragments
    - matching textbook chunk
    - needed templates
-9. Generate note.
-10. Update chapter index.
-11. Generate global indexes.
-12. Validate and fix only affected notes.
+11. Generate note.
+12. Update chapter index.
+13. Generate or refresh only affected global indexes.
+14. Validate and fix only affected notes.
 
 ## 8. Stage 1 — inspect conversations first
 
@@ -395,12 +434,13 @@ For every exported conversation `.md` file:
 
 Use textbook to:
 
-1. Detect chapters, sections, and subsections.
-2. Preserve numbering.
-3. Identify formulas, tables, examples, diagrams, URLs, datasets, and references.
-4. Build a machine-readable outline.
-5. Mark missing or unreadable content.
-6. Use textbook as a coverage checklist.
+1. Ask or confirm whether to read chapter-by-chapter, full book, or a user-specified range.
+2. Detect chapters, sections, and subsections from the outline or selected scope.
+3. Preserve numbering.
+4. Identify formulas, tables, examples, diagrams, URLs, datasets, and references in the selected scope.
+5. Build a machine-readable outline.
+6. Mark missing or unreadable content.
+7. Use textbook as a coverage checklist for the selected scope.
 
 ## 10. Stage 3 — map conversations to textbook subsections
 
@@ -772,6 +812,7 @@ indexes/待深入学习的问题.md
 Complete only when:
 
 - conversation files have been inventoried
+- textbook reading strategy has been confirmed and recorded
 - textbook hierarchy has been extracted
 - dialogue fragments have been mapped
 - the target Obsidian vault or output directory has been identified
