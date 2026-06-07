@@ -557,21 +557,22 @@ Recommended structure:
 
 ### 12.1 External resources
 
-For domains where external practice or reference materials are useful, add curated external resources with short annotations.
+For every subject, add curated external resources with short annotations when they improve learning, practice, application, or verification.
 
-For data structures and algorithms, consider:
+Choose resources by subject type, not by a fixed list:
 
-- LeetCode problem links for matching patterns and operations;
-- algorithm visualizers when helpful;
-- authoritative references for definitions or complexity;
-- implementation references only when they clarify the topic.
+- practice-heavy subjects: exercises, problem sets, judges, quizzes, worked examples, or labs;
+- data-heavy subjects: datasets, benchmark suites, data portals, reproducible notebooks, or dataset documentation;
+- tool-heavy subjects: official documentation, API references, tutorials, examples, or configuration guides;
+- theory-heavy subjects: papers, standards, textbook companion pages, proofs, lecture notes, or authoritative references;
+- visual or process-heavy subjects: simulators, visualizers, interactive demos, diagrams, or case studies;
+- applied subjects: real cases, domain reports, regulations, standards, templates, or practitioner guides.
 
-For data mining, machine learning, and data analysis, consider:
+Examples only:
 
-- public dataset sources such as UCI Machine Learning Repository, Kaggle, OpenML, Hugging Face Datasets, government open data portals, and domain-specific dataset pages;
-- benchmark datasets when relevant;
-- documentation pages for tools or libraries when useful;
-- papers or textbook companion resources when they clarify the topic.
+- data structures and algorithms may use LeetCode, algorithm visualizers, or authoritative complexity references;
+- data mining may use UCI Machine Learning Repository, Kaggle, OpenML, Hugging Face Datasets, government open data portals, benchmark datasets, papers, or library documentation;
+- other subjects must use analogous high-value resources that fit that subject.
 
 Rules:
 
@@ -580,7 +581,7 @@ Rules:
 - Add one short annotation per resource explaining why it belongs here.
 - Mark the resource type, such as practice, dataset, visualization, reference, documentation, or paper.
 - If current links, dataset availability, or problem titles are uncertain, verify them before writing exact URLs.
-- Put broad resources in `indexes/数据集与外部资源.md` and topic-specific resources inside the relevant note.
+- Put broad resources in `indexes/数据集与外部资源.md` or an equivalent external-resource index, and topic-specific resources inside the relevant note.
 
 ## 13. Provenance callouts
 
@@ -726,9 +727,8 @@ indexes/待深入学习的问题.md
 `数据集与外部资源.md` should summarize:
 
 - external practice links grouped by topic;
-- dataset links grouped by chapter, method, or task;
-- LeetCode or algorithm-practice links for data-structure topics;
-- dataset repositories for data mining topics;
+- datasets, cases, labs, tools, visualizations, documents, papers, standards, or official references grouped by chapter, method, task, or subject;
+- subject-appropriate resources, such as LeetCode-style practice for algorithms or dataset repositories for data-oriented topics;
 - short annotations explaining how to use each resource;
 - source notes and verification dates when exact external URLs are used.
 
@@ -744,7 +744,7 @@ indexes/待深入学习的问题.md
 - Preserve textbook hierarchy.
 - Create one note per smallest meaningful subsection.
 - Label conversation-derived and textbook-only additions.
-- Include curated external resources when they improve learning, especially LeetCode-style practice for data structures and dataset sources for data mining.
+- Include curated external resources when they improve learning, using the resource types that fit the current subject.
 - Do not paste raw transcripts.
 - Do not skip important textbook content merely because it was not discussed.
 - Do not let textbook summary style erase the learner's real questions.
