@@ -59,9 +59,30 @@ book-to-obsidian/
 └── assets/
 ```
 
-## 准备输入文件
+## 使用方式一：直接拖拽文件
 
-建议为每次转换准备一个独立工作目录：
+最省事的方式是直接把文件拖到 Codex 对话里，然后调用 skill。
+
+你可以拖入：
+
+- 导出的 AI 学习对话 `.md` 文件；
+- 教材 PDF、Markdown 或文本文件；
+- 你自己的补充笔记。
+
+然后这样说：
+
+```text
+请使用 $book-to-obsidian，读取我刚刚拖进来的对话 Markdown 和教材，
+按对话 60%、教材 40% 的权重生成 Obsidian vault，输出到 ./vault。
+```
+
+在这种模式下，不需要提前把对话 Markdown 放进 `inputs/conversations/`。skill 会优先使用当前对话里上传或拖拽的附件，并把附件文件名保存在来源记录里。
+
+如果 Codex 当前环境无法直接读取附件内容，或者文件数量很大、教材很长，再改用下面的工作区目录方式。
+
+## 使用方式二：工作区目录
+
+如果文件很多，或者你希望以后反复运行同一批材料，建议为每次转换准备一个独立工作目录：
 
 ```text
 workspace/
@@ -112,6 +133,13 @@ workspace/
 请使用 $book-to-obsidian，按对话 60%、教材 40% 的权重，
 将 inputs/conversations 中的学习记录和 inputs/textbook 中的教材
 整合成 Obsidian 笔记，输出到 vault。
+```
+
+如果是拖拽附件模式，可以这样说：
+
+```text
+请使用 $book-to-obsidian，读取本轮对话里上传的 Markdown 对话和教材，
+生成 Obsidian vault 到 ./vault。
 ```
 
 也可以给得更具体：

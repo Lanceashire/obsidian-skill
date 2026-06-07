@@ -94,9 +94,9 @@ It is a learner-specific study system:
 
 Required:
 
-- one or more exported AI learning conversation `.md` files
-- textbook source file or textbook directory
-- output directory
+- one or more exported AI learning conversation `.md` files, either attached in the current Codex conversation or available as filesystem paths
+- textbook source file or textbook directory, either attached in the current Codex conversation or available as filesystem paths
+- output directory for the generated vault
 
 Optional:
 
@@ -115,7 +115,45 @@ Default to:
 - one chapter folder per chapter
 - one Markdown note per smallest meaningful subsection
 
-## 4. Recommended input layout
+### 3.1 Input priority
+
+Prefer attached or dragged-in files when the user provides them in the current Codex conversation.
+
+Use this priority:
+
+1. Current conversation attachments, including dragged-in Markdown files, PDFs, notes, or text files.
+2. Explicit filesystem paths supplied by the user.
+3. The recommended `inputs/` layout below.
+
+Do not require the user to copy conversation Markdown files into the workspace if the same files are already attached and readable in the current conversation.
+
+If attached files are available only as summarized chat context and not as readable file contents, ask the user for either:
+
+- the actual attached file content,
+- a workspace path,
+- or a zip/folder containing the files.
+
+When using attached files, preserve each attachment name as `source_file` in inventories, mappings, front matter, and source notes.
+
+### 3.2 Drag-and-run usage
+
+The user may drag exported conversation Markdown files and a textbook file directly into the Codex conversation, then invoke:
+
+```text
+Please use $book-to-obsidian on the attached conversation Markdown files and attached textbook. Generate the Obsidian vault in ./vault.
+```
+
+In this mode:
+
+- treat attached Markdown files that look like exported AI conversations as `inputs/conversations`;
+- treat attached textbook PDFs, Markdown files, text files, or directories as `inputs/textbook`;
+- treat attached personal notes as `inputs/notes`;
+- generate all durable outputs in the requested workspace output directory;
+- still create `mappings/`, `indexes/`, and provenance records.
+
+## 4. Recommended filesystem input layout
+
+This layout is optional when files are provided as current conversation attachments.
 
 ```text
 workspace/
