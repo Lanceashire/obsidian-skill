@@ -480,6 +480,23 @@ If conversation evidence and textbook importance disagree:
 
 Each note should reflect the user's actual learning path.
 
+Content quality requirements for every note:
+
+- Provide high-quality, well-organized, practical notes.
+- Be detailed enough for real study and review, especially for core knowledge points.
+- Avoid unnecessary verbosity, duplicated explanations, and overly complex wording.
+- Use Markdown actively: headings, short paragraphs, ordered steps, tables, checklists, callouts, internal links, external links, code blocks, and mermaid diagrams when they genuinely improve understanding.
+- Use LaTeX actively for formulas, recurrences, complexity expressions, probability, matrices, optimization objectives, distance measures, and algorithmic definitions.
+- Prefer readable display math for important formulas:
+  ```markdown
+  $$
+  T(n)=2T\left(\frac{n}{2}\right)+O(n)
+  $$
+  ```
+- Use inline math for small symbols or terms, such as `$O(n \log n)$`, `$k$`, `$d(x_i,x_j)$`.
+- Explain formulas immediately after writing them, including variable meanings, assumptions, and common mistakes.
+- For algorithms and data-structure operations, include practical examples, pseudocode or code snippets when useful, edge cases, and complexity.
+
 Use front matter:
 
 ```yaml
@@ -533,8 +550,37 @@ Recommended structure:
 
 ## 14. 来源说明
 
-## 15. 本小节复习清单
+## 15. 外部练习、数据集与延伸资源
+
+## 16. 本小节复习清单
 ```
+
+### 12.1 External resources
+
+For domains where external practice or reference materials are useful, add curated external resources with short annotations.
+
+For data structures and algorithms, consider:
+
+- LeetCode problem links for matching patterns and operations;
+- algorithm visualizers when helpful;
+- authoritative references for definitions or complexity;
+- implementation references only when they clarify the topic.
+
+For data mining, machine learning, and data analysis, consider:
+
+- public dataset sources such as UCI Machine Learning Repository, Kaggle, OpenML, Hugging Face Datasets, government open data portals, and domain-specific dataset pages;
+- benchmark datasets when relevant;
+- documentation pages for tools or libraries when useful;
+- papers or textbook companion resources when they clarify the topic.
+
+Rules:
+
+- Do not dump long link lists.
+- Prefer 3-7 high-value resources per note when external resources are relevant.
+- Add one short annotation per resource explaining why it belongs here.
+- Mark the resource type, such as practice, dataset, visualization, reference, documentation, or paper.
+- If current links, dataset availability, or problem titles are uncertain, verify them before writing exact URLs.
+- Put broad resources in `indexes/数据集与外部资源.md` and topic-specific resources inside the relevant note.
 
 ## 13. Provenance callouts
 
@@ -677,17 +723,32 @@ indexes/待深入学习的问题.md
 - concepts requiring extra exercises
 - topics upgraded due to dialogue evidence
 
+`数据集与外部资源.md` should summarize:
+
+- external practice links grouped by topic;
+- dataset links grouped by chapter, method, or task;
+- LeetCode or algorithm-practice links for data-structure topics;
+- dataset repositories for data mining topics;
+- short annotations explaining how to use each resource;
+- source notes and verification dates when exact external URLs are used.
+
 ## 17. Quality requirements
 
 - Conversation content drives emphasis and learning flow.
 - Textbook content fills gaps and guarantees systematic coverage.
+- Notes are detailed, orderly, practical, and suitable for long-term review.
+- Use Markdown structure well instead of long unbroken paragraphs.
+- Use LaTeX well for formulas and mathematical expressions.
+- Explain symbols, assumptions, and common formula mistakes.
 - Use 60/40 weighting explicitly.
 - Preserve textbook hierarchy.
 - Create one note per smallest meaningful subsection.
 - Label conversation-derived and textbook-only additions.
+- Include curated external resources when they improve learning, especially LeetCode-style practice for data structures and dataset sources for data mining.
 - Do not paste raw transcripts.
 - Do not skip important textbook content merely because it was not discussed.
 - Do not let textbook summary style erase the learner's real questions.
+- Do not add excessive link lists or unannotated external resources.
 - Upgrade depth based on actual confusion.
 - Keep OCR and engineering logs visible when useful.
 
@@ -703,6 +764,8 @@ indexes/待深入学习的问题.md
 - Never flatten nested subsections.
 - Never make later chapters shallower because context is long.
 - Never force-map unrelated dialogue fragments.
+- Never write formulas as plain text when LaTeX would be clearer.
+- Never add external links without explaining why they are useful.
 
 ## 19. Definition of done
 
@@ -719,6 +782,8 @@ Complete only when:
 - dialogue-driven emphasis is visible
 - textbook-only补漏 content is visible
 - incorrect dialogue claims are corrected
+- Markdown structure and LaTeX formula usage have been checked
+- relevant external resources have been annotated and indexed
 - recurring questions are indexed
 - learning weak points are indexed
 - unresolved dialogue fragments remain visible
